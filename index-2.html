@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>متجري.dz</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>body{font-family:'Tajawal',Tahoma,sans-serif;background:#f9fafb}.lc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.dr{transition:transform .3s}</style>
+</head>
+<body class="text-gray-800 pb-20">
+<div class="bg-slate-900 text-white text-xs py-2 px-3 text-center">🚚 توصيل لـ 58 ولاية &nbsp;|&nbsp; 💵 الدفع عند الاستلام</div>
+
+<header class="bg-white sticky top-0 z-30 shadow-md">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+    <div class="flex items-center gap-2">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 text-white flex items-center justify-center font-black text-xl">M</div>
+      <div><div id="brand" class="font-extrabold text-xl leading-none">متجري.dz</div><div class="text-[10px] text-gray-500 mt-0.5">تسوق أونلاين في الجزائر</div></div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="openAdmin()" class="p-2.5 rounded-full bg-amber-50 text-xl leading-none" aria-label="الإدارة">🔒</button>
+      <button onclick="openAcc()" class="p-2.5 rounded-full bg-gray-100 text-xl leading-none" aria-label="حسابي">👤</button>
+      <button onclick="toggleCart(true)" class="relative p-2.5 rounded-full bg-rose-50 text-xl leading-none">🛍️
+        <span id="cc" class="absolute -top-1 -right-1 bg-rose-600 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">0</span></button>
+    </div>
+  </div>
+  <div class="px-4 pb-3"><input id="q" oninput="setQ(this.value)" placeholder="بحث عن المنتجات..." class="w-full bg-gray-100 border rounded-lg py-2 px-4 text-xs outline-none focus:border-rose-500"></div>
+</header>
+
+<section class="max-w-7xl mx-auto px-4 mt-4">
+  <div class="rounded-2xl bg-gradient-to-r from-rose-600 to-amber-500 text-white p-6 md:p-10 shadow-lg">
+    <span class="bg-white/20 text-xs px-3 py-1 rounded-full font-bold mb-2 inline-block">العروض الحصرية</span>
+    <h1 class="text-2xl md:text-4xl font-extrabold mb-2">تسوق أفضل المنتجات بأفضل الأسعار</h1>
+    <p class="text-white/90 text-sm">التوصيل متوفر لجميع الولايات مع الدفع عند الاستلام.</p>
+  </div>
+</section>
+
+<main class="max-w-7xl mx-auto px-4 mt-8">
+  <div class="flex justify-between items-center mb-6"><h2 class="text-xl font-extrabold border-r-4 border-rose-600 pr-3">منتجاتنا</h2><span id="pc" class="text-xs text-gray-500"></span></div>
+  <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+</main>
+
+<!-- Cart -->
+<div id="cartD" class="dr fixed inset-0 z-50 pointer-events-none" style="transform:translateX(-100%)">
+  <div onclick="toggleCart(false)" class="absolute inset-0 bg-black/50 pointer-events-auto"></div>
+  <div class="relative w-80 max-w-[85%] bg-white h-full shadow-2xl flex flex-col pointer-events-auto ml-auto">
+    <div class="p-4 border-b flex justify-between bg-gray-50"><h3 class="font-bold">🛍️ سلة الشراء</h3><button onclick="toggleCart(false)" class="text-gray-400">✕</button></div>
+    <div id="items" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+    <div class="p-4 border-t bg-gray-50 space-y-3">
+      <div class="flex justify-between font-bold"><span>المجموع:</span><span id="tot" class="text-rose-600"></span></div>
+      <button onclick="openCheckout()" class="w-full bg-rose-600 text-white font-bold py-3 rounded-xl">تأكيد الطلب الآن</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div id="accM" class="fixed inset-0 z-50 hidden bg-black/60 items-center justify-center p-4"><div class="bg-white rounded-2xl max-w-md w-full p-6 relative text-center space-y-3">
+  <button onclick="closeM('accM')" class="absolute left-4 top-4 text-gray-400 text-xl">✕</button>
+  <div id="accBody"></div></div></div>
+
+<div id="adminM" class="fixed inset-0 z-50 hidden bg-black/60 items-center justify-center p-4"><div class="bg-white rounded-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto space-y-4">
+  <button onclick="closeM('adminM')" class="absolute left-4 top-4 text-gray-400 text-xl">✕</button>
+  <h3 class="font-bold">⚙️ إدارة المتجر</h3>
+  <div class="flex gap-2"><input id="sn" placeholder="اسم المتجر" class="flex-1 border rounded-lg p-2 text-xs"><button onclick="saveName()" class="bg-slate-900 text-white px-3 rounded-lg text-xs font-bold">حفظ</button></div>
+  <div class="space-y-2 border-t pt-3"><h4 class="text-xs font-extrabold">إضافة منتج:</h4>
+    <input id="pn" placeholder="اسم المنتج" class="w-full border rounded-lg p-2 text-xs">
+    <input id="pp" type="number" placeholder="السعر (د.ج)" class="w-full border rounded-lg p-2 text-xs">
+    <input id="pf" type="file" accept="image/*" class="w-full text-xs">
+    <button id="addBtn" onclick="addProduct()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs">+ إضافة المنتج</button></div>
+  <div class="border-t pt-3"><h4 class="text-xs font-extrabold mb-2">آخر الطلبات:</h4><div id="orders" class="space-y-2 text-xs"></div></div>
+</div></div>
+
+<div id="coM" class="fixed inset-0 z-50 hidden bg-black/60 items-center justify-center p-4"><div class="bg-white rounded-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
+  <button onclick="closeM('coM')" class="absolute left-4 top-4 text-gray-400 text-xl">✕</button>
+  <div id="coForm"><h3 class="font-extrabold text-lg text-center mb-3">معلومات التوصيل</h3>
+  <form onsubmit="submitOrder(event)" class="space-y-3">
+    <input required id="fn" placeholder="الاسم الكامل *" class="w-full border rounded-xl p-2.5 text-xs">
+    <input required id="ph" type="tel" pattern="0[5-7][0-9]{8}" placeholder="رقم الهاتف * (06XXXXXXXX)" class="w-full border rounded-xl p-2.5 text-xs">
+    <select required id="wl" class="w-full border rounded-xl p-2.5 text-xs"><option value="">اختر الولاية...</option></select>
+    <input required id="ad" placeholder="العنوان التفصيلي *" class="w-full border rounded-xl p-2.5 text-xs">
+    <div class="bg-gray-50 rounded-xl p-3 text-xs flex justify-between font-bold"><span>المجموع</span><span id="coTot" class="text-rose-600"></span></div>
+    <button id="sendBtn" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">تأكيد الطلب</button>
+  </form></div>
+  <div id="coDone" class="hidden text-center py-6 space-y-2"><div class="text-5xl">✅</div><h3 class="font-extrabold text-lg">تم استلام طلبك!</h3><p class="text-sm text-gray-600">سنتصل بك قريباً لتأكيد الطلب.</p>
+    <a id="waLink" target="_blank" class="hidden block bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm">📲 أرسل الطلب عبر واتساب</a>
+    <button onclick="closeM('coM')" class="mt-2 bg-slate-900 text-white px-6 py-2 rounded-xl text-sm font-bold">حسناً</button></div>
+</div></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore,collection,doc,onSnapshot,addDoc,deleteDoc,setDoc,query,orderBy,limit,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+/* ====== عدّل هذه القيم فقط ====== */
+const CFG={apiKey:"AIzaSyDTT9BeL4wamAwKlECBagvVMbVT5MEt9hs",authDomain:"matjari-dz---algeria-market.firebaseapp.com",projectId:"matjari-dz---algeria-market",appId:"1:598692896924:web:4c1eb4d166fae117aa0d59"};
+const ADMINS=["ouk92981@gmail.com"];   // البريد المسموح له بالإدارة
+const WA="";                           // رقم واتساب بالصيغة الدولية: 213555123456
+/* ================================= */
+
+const $=id=>document.getElementById(id);
+const app=initializeApp(CFG),db=getFirestore(app),auth=getAuth(app);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Number(n).toLocaleString('en-US').replace(/,/g,' ');
+const W="أدرار,الشلف,الأغواط,أم البواقي,باتنة,بجاية,بسكرة,بشار,البليدة,البويرة,تمنراست,تبسة,تلمسان,تيارت,تيزي وزو,الجزائر,الجلفة,جيجل,سطيف,سعيدة,سكيكدة,سيدي بلعباس,عنابة,قالمة,قسنطينة,المدية,مستغانم,المسيلة,معسكر,ورقلة,وهران,البيض,إليزي,برج بوعريريج,بومرداس,الطارف,تندوف,تسمسيلت,الوادي,خنشلة,سوق أهراس,تيبازة,ميلة,عين الدفلى,النعامة,عين تموشنت,غرداية,غليزان,تيميمون,برج باجي مختار,أولاد جلال,بني عباس,عين صالح,عين قزام,تقرت,جانت,المغير,المنيعة".split(',');
+$('wl').innerHTML+=W.map((w,i)=>`<option>${String(i+1).padStart(2,'0')} - ${w}</option>`).join('');
+
+let products=[],cart=[],query_='',user=null,unsubOrders=null;
+try{cart=JSON.parse(localStorage.getItem('dz_cart')||'[]')}catch(e){}
+const isAdmin=()=>user&&ADMINS.includes(user.email);
+
+onSnapshot(doc(db,'settings','store'),s=>{if(s.exists()&&s.data().name){$('brand').innerText=s.data().name;document.title=s.data().name}});
+onSnapshot(query(collection(db,'products'),orderBy('createdAt','desc')),s=>{products=s.docs.map(d=>({id:d.id,...d.data()}));render();saveCart()},e=>{$('grid').innerHTML='<p class="col-span-full text-center text-sm text-rose-600">تعذّر تحميل المنتجات. تحقق من إعدادات Firebase.</p>'});
+
+function render(){
+  const it=products.filter(p=>p.name.toLowerCase().includes(query_));
+  $('pc').innerText=it.length+' منتج';
+  $('grid').innerHTML=it.length?it.map(p=>`<div class="bg-white rounded-2xl border overflow-hidden shadow-sm flex flex-col justify-between relative">
+    ${isAdmin()?`<button onclick="delProduct('${p.id}')" class="absolute top-2 left-2 z-10 bg-rose-600 text-white w-7 h-7 rounded-full text-xs">🗑</button>`:''}
+    <div><div class="h-40 bg-gray-100"><img src="${p.image}" alt="" class="w-full h-full object-cover"></div>
+    <div class="p-3"><h3 class="font-bold text-xs sm:text-sm lc h-9 mb-1">${esc(p.name)}</h3><div class="text-rose-600 font-extrabold">${fmt(p.price)} <span class="text-[10px]">د.ج</span></div></div></div>
+    <div class="p-3 pt-0"><button onclick="addCart('${p.id}')" class="w-full bg-slate-900 hover:bg-rose-600 text-white font-bold py-2 rounded-xl text-xs">🛒 أضف للسلة</button></div></div>`).join(''):
+    '<div class="col-span-full text-center py-12 bg-white rounded-2xl border border-dashed"><div class="text-4xl mb-2">🏪</div><h3 class="font-bold text-sm">لا توجد منتجات حالياً</h3></div>';
+}
+function total(){return cart.reduce((s,c)=>{const p=products.find(x=>x.id===c.id);return s+(p?p.price*c.q:0)},0)}
+function saveCart(){
+  cart=cart.filter(c=>products.some(p=>p.id===c.id)||!products.length);
+  try{localStorage.setItem('dz_cart',JSON.stringify(cart))}catch(e){}
+  $('cc').innerText=cart.reduce((s,c)=>s+c.q,0);$('tot').innerText=fmt(total())+' د.ج';
+  $('items').innerHTML=cart.length?cart.map(c=>{const p=products.find(x=>x.id===c.id);return p?`<div class="flex gap-3 items-center border rounded-xl p-2"><img src="${p.image}" class="w-14 h-14 rounded-lg object-cover">
+  <div class="flex-1 min-w-0"><div class="text-xs font-bold truncate">${esc(p.name)}</div><div class="text-xs text-rose-600 font-bold">${fmt(p.price)} د.ج</div>
+  <div class="flex items-center gap-2 mt-1"><button onclick="qty('${p.id}',-1)" class="w-6 h-6 bg-gray-100 rounded">−</button><span class="text-xs font-bold">${c.q}</span><button onclick="qty('${p.id}',1)" class="w-6 h-6 bg-gray-100 rounded">+</button></div></div></div>`:''}).join(''):'<p class="text-center text-sm text-gray-400 mt-10">السلة فارغة</p>';
+}
+const W2={
+setQ(v){query_=v.trim().toLowerCase();render()},
+addCart(id){const c=cart.find(x=>x.id===id);c?c.q++:cart.push({id,q:1});saveCart();toggleCart(true)},
+qty(id,d){const c=cart.find(x=>x.id===id);if(!c)return;c.q+=d;if(c.q<1)cart=cart.filter(x=>x.id!==id);saveCart()},
+toggleCart(o){const d=$('cartD');d.style.transform=o?'translateX(0)':'translateX(-100%)';d.classList.toggle('pointer-events-none',!o)},
+openM(id){$(id).classList.remove('hidden');$(id).classList.add('flex')},
+closeM(id){$(id).classList.add('hidden');$(id).classList.remove('flex')},
+openCheckout(){if(!cart.length){alert('السلة فارغة');return}toggleCart(false);$('coForm').classList.remove('hidden');$('coDone').classList.add('hidden');$('coTot').innerText=fmt(total())+' د.ج';if(user&&!$('fn').value)$('fn').value=user.displayName||'';openM('coM')},
+async submitOrder(e){e.preventDefault();$('sendBtn').disabled=true;
+  const items=cart.map(c=>{const p=products.find(x=>x.id===c.id);return {name:p.name,price:p.price,q:c.q}});
+  const o={name:$('fn').value,phone:$('ph').value,wilaya:$('wl').value,address:$('ad').value,items,total:total(),email:user?user.email:'',createdAt:serverTimestamp()};
+  try{await addDoc(collection(db,'orders'),o)}catch(err){alert('تعذّر إرسال الطلب، حاول مرة أخرى');$('sendBtn').disabled=false;return}
+  const msg=`طلب جديد 🛍️\nالاسم: ${o.name}\nالهاتف: ${o.phone}\nالولاية: ${o.wilaya}\nالعنوان: ${o.address}\n\n`+items.map(i=>`• ${i.name} × ${i.q}`).join('\n')+`\n\nالمجموع: ${fmt(o.total)} د.ج`;
+  const a=$('waLink');a.classList.toggle('hidden',!WA);if(WA)a.href='https://wa.me/'+WA+'?text='+encodeURIComponent(msg);
+  cart=[];saveCart();e.target.reset();$('sendBtn').disabled=false;$('coForm').classList.add('hidden');$('coDone').classList.remove('hidden')},
+async login(){try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){alert('تعذّر تسجيل الدخول')}},
+logout(){signOut(auth);closeM('accM');closeM('adminM')},
+openAcc(){$('accBody').innerHTML=user?`<img src="${esc(user.photoURL||'')}" class="w-16 h-16 rounded-full mx-auto"><h3 class="font-bold">${esc(user.displayName||'')}</h3><p class="text-xs text-gray-500">${esc(user.email)}</p><button onclick="logout()" class="text-xs text-rose-600 underline">تسجيل الخروج</button>`:
+  `<div class="text-3xl">👤</div><h3 class="font-extrabold">تسجيل الدخول</h3><p class="text-xs text-gray-500">ادخل بحساب قوقل لتسريع طلباتك</p><button onclick="login()" class="w-full border rounded-xl py-2.5 font-bold text-sm">🔵 المتابعة مع Google</button>`;openM('accM')},
+async openAdmin(){if(!user)await login();if(!user)return;if(!isAdmin()){alert('هذا الحساب غير مصرّح له بالإدارة');return}
+  $('sn').value=$('brand').innerText;openM('adminM');
+  if(!unsubOrders)unsubOrders=onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc'),limit(20)),s=>{
+   $('orders').innerHTML=s.docs.map(d=>{const o=d.data();return `<div class="border rounded-lg p-2"><b>${esc(o.name)}</b> · ${esc(o.phone)}<br>${esc(o.wilaya)} - ${esc(o.address)}<br>${(o.items||[]).map(i=>esc(i.name)+' ×'+i.q).join('، ')}<br><b class="text-rose-600">${fmt(o.total)} د.ج</b></div>`}).join('')||'<p class="text-gray-400">لا توجد طلبات</p>'})},
+async saveName(){const v=$('sn').value.trim();if(v)await setDoc(doc(db,'settings','store'),{name:v},{merge:true})},
+async delProduct(id){if(confirm('حذف هذا المنتج؟'))await deleteDoc(doc(db,'products',id))},
+async addProduct(){const n=$('pn').value.trim(),p=+$('pp').value,f=$('pf').files[0];if(!n||!p||!f){alert('أدخل الاسم والسعر والصورة');return}
+  $('addBtn').disabled=true;
+  try{const image=await toData(f);await addDoc(collection(db,'products'),{name:n,price:p,image,createdAt:serverTimestamp()});$('pn').value=$('pp').value=$('pf').value=''}
+  catch(e){alert('تعذّرت الإضافة: '+e.message)}$('addBtn').disabled=false}
+};
+function toData(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*s;c.height=im.height*s;c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.7))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
+Object.assign(window,W2);
+const login=W2.login;
+onAuthStateChanged(auth,u=>{user=u;render()});
+</script>
+</body>
+</html>
